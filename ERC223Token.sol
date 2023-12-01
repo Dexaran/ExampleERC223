@@ -28,6 +28,7 @@ contract ERC223Token {
     {
         balances[msg.sender] = 100 * 10 ** _decimals;
         _totalSupply         = 100 * 10 ** _decimals;
+        emit Transfer(address(0), msg.sender, 100 * 10 ** _decimals, hex"000000");
     }
 
     function name()                    public view returns (string memory) { return _name; }
