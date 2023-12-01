@@ -17,18 +17,17 @@ contract ERC223Token {
 
     event Transfer(address indexed from, address indexed to, uint value, bytes data);
 
-    string  private _name;
-    string  private _symbol;
-    uint8   private _decimals;
+    string  private _name     = "My ERC-223 Token";
+    string  private _symbol   = "MTKN";
+    uint8   private _decimals = 18;
     uint256 private _totalSupply;
     
     mapping(address => uint256) private balances;
 
-    constructor(string memory new_name, string memory new_symbol, uint8 new_decimals)
+    constructor()
     {
-        _name     = "My ERC-223 Token";
-        _symbol   = "MTKN";
-        _decimals = 18;
+        balances[msg.sender] = 100 * 10 ** _decimals;
+        _totalSupply         = 100 * 10 ** _decimals;
     }
 
     function name()                    public view returns (string memory) { return _name; }
@@ -40,15 +39,9 @@ contract ERC223Token {
 
     function transfer(address _to, uint _value, bytes calldata _data) public returns (bool success)
     {
-        // Standard function transfer similar to ERC20 transfer with no _data .
-        // Added due to backwards compatibility reasons .
         balances[msg.sender] = balances[msg.sender] - _value;
         balances[_to] = balances[_to] + _value;
         if(Address.isContract(_to)) {
-            // It is subjective if the contract call must fail or not
-            // when ERC-223 token transfer does not trigger the `tokenReceived` function
-            // by the standard if the receiver did not explicitly rejected the call
-            // the transfer can be considered valid.
             IERC223Recipient(_to).tokenReceived(msg.sender, _value, _data);
         }
         emit Transfer(msg.sender, _to, _value, _data);
